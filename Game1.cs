@@ -14,8 +14,10 @@ namespace SpaceInvaders
         public Vector2 pos;
         public Vector2 velocity;
         public int windowHeight;
+        public Rectangle hitbox;
         public Enemy enemy;
         public List<Enemy> enemyList;
+
 
         public Game1()
         {
@@ -35,27 +37,36 @@ namespace SpaceInvaders
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = 800;
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.ApplyChanges();                        //Skärmstorlek
+
             enemyTex = Content.Load<Texture2D>("space__0002_B1"); //Enemy Texturen
             windowHeight = Window.ClientBounds.Height;
-            velocity = new Vector2(0, 0);    // Enemy movement
+            velocity = new Vector2(0, 1);    // Enemy movement
             enemyList = new List<Enemy>();  //Enemy listan
-            for (int i = 0; i < 20; i++) 
+            for (int i = 0; i < 45; i++) 
             {
                 enemy = CreateEnemy(i);
                 enemyList.Add(enemy);
             }
 
-            graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferHeight = 1080;
-            graphics.PreferredBackBufferWidth = 800;
-            graphics.ApplyChanges();                        //Skärmstorlek
+
 
             // TODO: use this.Content to load your game content here
         }
 
-        public Enemy CreateEnemy (int i)
+        public Enemy CreateEnemy(int i)
         {
-           Vector2 pos = new Vector2(i*32, 10);                                //var nya enemies skapas i samband med den förra
+            int enemiesPerRow = 15;
+            int row = i / enemiesPerRow;          // Bestämmer om fienden börjar på rad 0, 1 eller 2
+            int col = i % enemiesPerRow;         // Bestämmer vilken kolumn
+
+            float x = col * 40;                // Fiendens X-position och mellanrummet till nästa kolumn
+            float y = row * 32 + 10;          //Fiendens Y-position och mellanrummet till nästa rad, vertikalt
+
+            Vector2 pos = new Vector2(x, y);     //var nya enemies skapas
             Enemy e = new Enemy(pos, windowHeight, enemyTex, velocity);
             return e;
         }
@@ -67,9 +78,24 @@ namespace SpaceInvaders
 
             // TODO: Add your update logic here
 
+            bool ememyReachedBottom = false;       // kontrolera om fienderna nått botten
+
             foreach (Enemy enemy in enemyList)
             {
                 enemy.Update();
+
+                if (enemy.pos.Y > windowHeight-enemy.tex.Height)
+                {
+                    ememyReachedBottom = true;               
+                }
+            }                                     // kontrollera om fienderna nått botten
+
+            if (ememyReachedBottom)
+            {
+                foreach (Enemy enemy in enemyList)         // om de har det händer detta
+                {
+                    enemy.ResetPosition();               // återvänd till startposition
+                }
             }
 
             base.Update(gameTime);
