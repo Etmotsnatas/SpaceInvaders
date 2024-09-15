@@ -11,12 +11,15 @@ namespace SpaceInvaders
         public SpriteBatch spriteBatch;
 
         public Texture2D enemyTex;
+        public Texture2D bulletTex;
         public Vector2 pos;
         public Vector2 velocity;
         public int windowHeight;
         public Rectangle hitbox;
         public Enemy enemy;
+        public Bullet bullet;
         public List<Enemy> enemyList;
+        public List<Bullet> bulletList;
 
 
         public Game1()
